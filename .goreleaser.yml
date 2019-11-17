@@ -21,7 +21,7 @@ checksum:
 snapshot:
   name_template: "{{ .Tag }}-next"
 brews:
-  - name: "{{ .ProjectName }}"
+  - name: nats-tls
     github:
       owner: tanelmae
       name: homebrew-brew
