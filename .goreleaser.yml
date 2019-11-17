@@ -2,7 +2,8 @@ before:
   hooks:
     - go mod vendor
 builds:
-  - env:
+  - main: ./cmd/main.go
+    env:
       - CGO_ENABLED=0
     ldflags:
       - -X main.Version={{.Version}}
@@ -18,12 +19,12 @@ checksum:
 snapshot:
   name_template: "{{ .Tag }}-next"
 brews:
-  - name: nats-tls
+  - name: "{{ .ProjectName }}"
     github:
       owner: tanelmae
       name: homebrew-brew
 
-    url_template: "http://github.com/tanelmae/nats-tls/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+    url_template: "http://github.com/tanelmae/{{ .ProjectName }}/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
 
     commit_author:
       name: tanelmae
@@ -31,9 +32,9 @@ brews:
 
     folder: Formula
 
-    homepage: "https://github.com/tanelmae/nats-tls"
+    homepage: "https://github.com/tanelmae/{{ .ProjectName }}"
 
     description: "Tool for generating NATS TLS keys and certificates"
 
     test: |
-      system "#{bin}/nats-tls -v"
+      system "#{bin}/{{ .ProjectName }} -v"
