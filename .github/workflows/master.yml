@@ -1,0 +1,33 @@
+name: Latest master
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go-setup
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Dependencies cache
+        uses: actions/cache@v1.0.0
+        id: cache
+        with:
+          path: vendor
+          key: ${{ runner.os }}-${{ hashFiles('**/go.sum') }}
+
+      - name: Get dependencies
+        id: dependencies
+        run: go mod vendor
+
+      - name: Build
+        id: go-build
+        run: go build -mod=readonly cmd/main.go
