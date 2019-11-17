@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"ftm"
+	"fmt"
 	"github.com/tanelmae/nats-tls/internal/config"
 	"github.com/tanelmae/nats-tls/internal/pemgen"
 	"log"
