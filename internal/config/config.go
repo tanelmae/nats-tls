@@ -114,7 +114,6 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 		if k == "default" || k == "ca" {
 			continue
 		}
-		log.Println(k)
 		certConf, err := resolveCertConf(k, v, defaults)
 		if err != nil {
 			return nil, err
