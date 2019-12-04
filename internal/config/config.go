@@ -18,10 +18,11 @@ type defaultHolder struct {
 
 // ParsedConfig is holder for resolved configuration
 type ParsedConfig struct {
-	CA     CertConfig `yaml:"ca"`
-	Route  CertConfig `yaml:"route"`
-	Server CertConfig `yaml:"server"`
-	Client CertConfig `yaml:"client"`
+	CA       CertConfig `yaml:"ca"`
+	Route    CertConfig `yaml:"route"`
+	Server   CertConfig `yaml:"server"`
+	Client   CertConfig `yaml:"client"`
+	Accounts CertConfig `yaml:"accounts"`
 }
 
 // CertConfig config holder for single key/certificate properties
@@ -103,15 +104,17 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 	}
 
 	conf := &ParsedConfig{
-		CA:     defs.Default,
-		Route:  defs.Default,
-		Server: defs.Default,
-		Client: defs.Default,
+		CA:       defs.Default,
+		Route:    defs.Default,
+		Server:   defs.Default,
+		Client:   defs.Default,
+		Accounts: defs.Default,
 	}
 	conf.CA.Name = "ca"
 	conf.Route.Name = "route"
 	conf.Server.Name = "server"
 	conf.Client.Name = "client"
+	conf.Accounts.Name = "accounts"
 
 	err = yaml.Unmarshal(confBytes, &conf)
 	if err != nil {
