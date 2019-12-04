@@ -39,8 +39,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pemgen.GenSignedCerts(conf.Route, *ca)
-	pemgen.GenSignedCerts(conf.Server, *ca)
-	pemgen.GenSignedCerts(conf.Client, *ca)
-	pemgen.GenSignedCerts(conf.Accounts, *ca)
+	for _, signable := range conf.Signables {
+		pemgen.GenSignedCerts(signable, *ca)
+	}
 }

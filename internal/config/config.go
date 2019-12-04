@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 
@@ -12,17 +13,10 @@ import (
 	"time"
 )
 
-type defaultHolder struct {
-	Default CertConfig
-}
-
 // ParsedConfig is holder for resolved configuration
 type ParsedConfig struct {
-	CA       CertConfig `yaml:"ca"`
-	Route    CertConfig `yaml:"route"`
-	Server   CertConfig `yaml:"server"`
-	Client   CertConfig `yaml:"client"`
-	Accounts CertConfig `yaml:"accounts"`
+	CA        CertConfig `yaml:"ca"`
+	Signables []CertConfig
 }
 
 // CertConfig config holder for single key/certificate properties
@@ -96,33 +90,49 @@ func (t *TTL) String() string {
 func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 	confBytes, err := ioutil.ReadFile(yamlPath)
 
-	// Read the defaults section and set it as the based for other sections
-	defs := &defaultHolder{}
-	err = yaml.Unmarshal(confBytes, &defs)
+	m := make(map[string]CertConfig)
+	err = yaml.Unmarshal(confBytes, &m)
 	if err != nil {
 		return nil, err
 	}
 
-	conf := &ParsedConfig{
-		CA:       defs.Default,
-		Route:    defs.Default,
-		Server:   defs.Default,
-		Client:   defs.Default,
-		Accounts: defs.Default,
+	conf := ParsedConfig{}
+	defaults, ok := m["default"]
+	if !ok {
+		defaults = CertConfig{}
 	}
-	conf.CA.Name = "ca"
-	conf.Route.Name = "route"
-	conf.Server.Name = "server"
-	conf.Client.Name = "client"
-	conf.Accounts.Name = "accounts"
 
-	err = yaml.Unmarshal(confBytes, &conf)
-	if err != nil {
-		return nil, err
+	if c, ok := m["ca"]; ok {
+		certConf, err := resolveCertConf("ca", c, defaults)
+		if err != nil {
+			return nil, err
+		}
+		conf.CA = *certConf
+	}
+
+	for k, v := range m {
+		if k == "default" || k == "ca" {
+			continue
+		}
+		log.Println(k)
+		certConf, err := resolveCertConf(k, v, defaults)
+		if err != nil {
+			return nil, err
+		}
+		conf.Signables = append(conf.Signables, *certConf)
 	}
 
 	if debug {
-		log.Println(*conf)
+		log.Println(conf)
 	}
-	return conf, nil
+	return &conf, nil
+}
+
+func resolveCertConf(name string, conf, defaults CertConfig) (*CertConfig, error) {
+	signable := defaults
+	signable.Name = name
+	if err := mergo.Merge(&signable, conf); err != nil {
+		return nil, err
+	}
+	return &signable, nil
 }
