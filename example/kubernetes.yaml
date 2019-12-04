@@ -1,0 +1,32 @@
+default:
+  path: dev-certs
+  key_length: 4096
+  subject:
+    org: "Unicorn Ltd."
+    country: "Mordor"
+  ttl: 24 hours
+ca:
+  subject:
+    cn: "Dev CA"
+# Example assumes DNS records created when
+# using headless service
+route:
+  dns:
+    - "*.nats.my-namespace.svc.cluster.local"
+  subject:
+    cn: "NATS route"
+# Can be used both when connecting directly to pods or via service
+server:
+  dns:
+    - "*.nats.my-namespace.svc.cluster.local"
+    - "nats.my-namespace.svc.cluster.local"
+  subject:
+    cn: "NATS server"
+client:
+  subject:
+    cn: "NATS client"
+accounts:
+  subject:
+    cn: "NATS accounts server"
+  dns:
+    - "nats-accounts.my-namespace.svc.cluster.local"

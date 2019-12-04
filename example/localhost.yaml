@@ -1,0 +1,23 @@
+default:
+  path: local
+  key_length: 2048
+  subject:
+    org: "My Laptop"
+    country: "Elbonia"
+  ttl: 24 hours
+ca:
+  subject:
+    cn: "Local CA"
+route:
+  dns:
+    - "localhost"
+  subject:
+    cn: "NATS route"
+server:
+  dns:
+    - "localhost"
+  subject:
+    cn: "NATS server"
+client:
+  subject:
+    cn: "NATS client"
