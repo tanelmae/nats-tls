@@ -16,6 +16,7 @@ route:
   subject:
     cn: "NATS route"
 # Can be used both when connecting directly to pods or via service
+# To use the same certs for both routes and server just remove one of the blocks
 server:
   dns:
     - "*.nats.my-namespace.svc.cluster.local"
