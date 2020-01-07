@@ -1,7 +1,6 @@
 # nats-tls
 Tool for generating NATS TLS keys and certificates based on single yaml configuration file. There is also section for `default` settings that can be used for shared settings for key/cert pairs to reduce duplication. Mostly aimed at developer workflows.
-
-Signature Algorithm: sha256WithRSAEncryption
+TTL supports "years", "months", "days", "hours", "minutes" and "seconds" as units and their singular forms.
 
 Configuration:
 ```
@@ -90,3 +89,5 @@ Binaries provided for Darwin_x86_64 and Linux_x86_64
 ```
 brew install tanelmae/brew/nats-tls
 ```
+
+Feel free to create an issue if you find any problems with this tool or you have ideas for improvements.
