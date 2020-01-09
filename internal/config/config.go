@@ -6,8 +6,8 @@ import (
 	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
-
 	"log"
+	"path"
 	"strconv"
 	"strings"
 	"time"
@@ -17,6 +17,7 @@ import (
 type ParsedConfig struct {
 	CA        CertConfig `yaml:"ca"`
 	Signables []CertConfig
+	BaseDir   string
 }
 
 // CertConfig config holder for single key/certificate properties
@@ -96,6 +97,8 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 		return nil, err
 	}
 
+	baseDir := path.Dir(yamlPath)
+
 	conf := ParsedConfig{}
 	defaults, ok := m["default"]
 	if !ok {
@@ -103,10 +106,16 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 	}
 
 	if c, ok := m["ca"]; ok {
+		log.Println(c.Path)
 		certConf, err := resolveCertConf("ca", c, defaults)
+		log.Println(certConf.Path)
+		if !strings.HasPrefix(certConf.Path, "/") {
+			certConf.Path = fmt.Sprintf("%s/%s", baseDir, certConf.Path)
+		}
 		if err != nil {
 			return nil, err
 		}
+		log.Println(certConf.Path)
 		conf.CA = *certConf
 	}
 
@@ -115,6 +124,13 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 			continue
 		}
 		certConf, err := resolveCertConf(k, v, defaults)
+
+		// Path defined will be relative to config file base directory.
+		// Unelss it is defined as absolute path.
+		if !strings.HasPrefix(certConf.Path, "/") {
+			certConf.Path = fmt.Sprintf("%s/%s", baseDir, certConf.Path)
+		}
+
 		if err != nil {
 			return nil, err
 		}
