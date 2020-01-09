@@ -146,7 +146,7 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 func resolveCertConf(name string, conf, defaults CertConfig) (*CertConfig, error) {
 	signable := defaults
 	signable.Name = name
-	if err := mergo.Merge(&signable, conf); err != nil {
+	if err := mergo.MergeWithOverwrite(&signable, conf); err != nil {
 		return nil, err
 	}
 	return &signable, nil
