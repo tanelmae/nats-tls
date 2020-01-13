@@ -106,16 +106,13 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 	}
 
 	if c, ok := m["ca"]; ok {
-		log.Println(c.Path)
 		certConf, err := resolveCertConf("ca", c, defaults)
-		log.Println(certConf.Path)
 		if !strings.HasPrefix(certConf.Path, "/") {
 			certConf.Path = fmt.Sprintf("%s/%s", baseDir, certConf.Path)
 		}
 		if err != nil {
 			return nil, err
 		}
-		log.Println(certConf.Path)
 		conf.CA = *certConf
 	}
 
@@ -144,10 +141,15 @@ func ParseConfig(yamlPath string, debug bool) (*ParsedConfig, error) {
 }
 
 func resolveCertConf(name string, conf, defaults CertConfig) (*CertConfig, error) {
-	signable := defaults
-	signable.Name = name
-	if err := mergo.MergeWithOverwrite(&signable, conf); err != nil {
+	baseConf := defaults
+	baseConf.Name = name
+	if err := mergo.MergeWithOverwrite(&baseConf, conf); err != nil {
 		return nil, err
 	}
-	return &signable, nil
+
+	if conf.TTL.ttl == "" {
+		baseConf.TTL = defaults.TTL
+	}
+
+	return &baseConf, nil
 }

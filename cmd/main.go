@@ -40,6 +40,7 @@ func main() {
 	}
 
 	for _, signable := range conf.Signables {
+		log.Println("==========================================")
 		pemgen.GenSignedCerts(signable, *ca)
 	}
 }

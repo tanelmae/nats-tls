@@ -29,6 +29,7 @@ type CA struct {
 
 // GenCA is for creatin CA key and certificate
 func GenCA(conf config.CertConfig) (*CA, error) {
+	log.Println("Creating CA key and certificate")
 	key, err := rsa.GenerateKey(rand.Reader, conf.KeyLength)
 	if err != nil {
 		return nil, err
@@ -49,6 +50,7 @@ func GenCA(conf config.CertConfig) (*CA, error) {
 		BasicConstraintsValid: true,
 	}
 
+	log.Printf("Certificate valid untiL: %s", conf.TTL.Expiration.Format("2006-01-02 15:04:05"))
 	caBytes, err := x509.CreateCertificate(rand.Reader, &cert, &cert, &key.PublicKey, key)
 	if err != nil {
 		return nil, err
@@ -62,6 +64,7 @@ func GenCA(conf config.CertConfig) (*CA, error) {
 
 // GenSignedCerts is used for creating signed ceritifcates for routes, servers and clients
 func GenSignedCerts(conf config.CertConfig, ca CA) error {
+	log.Printf("Creating '%s' key and certificate", conf.Name)
 	key, err := rsa.GenerateKey(rand.Reader, conf.KeyLength)
 	if err != nil {
 		return err
@@ -85,6 +88,7 @@ func GenSignedCerts(conf config.CertConfig, ca CA) error {
 		BasicConstraintsValid: true,
 	}
 
+	log.Printf("Certificate valid untiL: %s", conf.TTL.Expiration.Format("2006-01-02 15:04:05"))
 	certBytes, err := x509.CreateCertificate(rand.Reader, cert, &ca.cert, &key.PublicKey, ca.key)
 	if err != nil {
 		return err
@@ -92,7 +96,7 @@ func GenSignedCerts(conf config.CertConfig, ca CA) error {
 
 	writeKey(key, conf.Path, conf.Name)
 	writeCert(certBytes, conf.Path, conf.Name)
-	log.Printf("%s key and cert created at %s", conf.Name, conf.Path)
+	log.Printf("Created at %s", conf.Path)
 	return nil
 }
 
